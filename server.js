@@ -3,22 +3,19 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-const Post = require('./models/Post');
-const Message = require('./models/Message'); // 🎯 YENİ: Mesaj modelini içeri aldık
+const Post = require('../models/Post');
+const Message = require('../models/Message');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// MongoDB'ye Bağlanma Komutu
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('MongoDB Atlas bağlantısı başarılı! ✅'))
-    .catch(err => console.error('Veri tabanı bağlantı hatası: ❌', err));
+    .then(() => console.log('MongoDB Atlas bağlantısı başarılı!'))
+    .catch(err => console.error('Bağlantı hatası:', err));
 
 // API Yolları
-
-// 1. Tüm yazıları listeleme
 app.get('/api/posts', async (req, res) => {
     try {
         const posts = await Post.find().sort({ createdAt: -1 });
@@ -27,7 +24,6 @@ app.get('/api/posts', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
-
 
 app.post('/api/posts', async (req, res) => {
     const newPost = new Post(req.body);
@@ -39,7 +35,6 @@ app.post('/api/posts', async (req, res) => {
     }
 });
 
-
 app.post('/api/contact', async (req, res) => {
     const newMessage = new Message(req.body);
     try {
@@ -50,7 +45,5 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Sunucu ${PORT} portunda çalışıyor... 🚀`);
-});
+// Vercel'in bu dosyayı API olarak tanıması için bu satır şart:
+module.exports = app;
